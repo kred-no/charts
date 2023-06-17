@@ -1,0 +1,25 @@
+{{- if .Values.gatewayApi.enabled }}
+apiVersion: gateway.networking.k8s.io/v1beta1
+kind: HTTPRoute
+
+metadata:
+  name: {{ include "payara-server.fullname" . }}-route
+  labels:
+    {{- include "payara-server.labels" . | nindent 4 }}
+
+spec:
+  hostnames: ["localhost"]
+  rules:
+  - matches:
+    - path:
+        type: PathPrefix
+        value: /Webservice
+    backendRefs:
+    - kind: Service
+      name: {{ include "payara-server.fullname" . }}
+      port: {{ .Values.server.httpService.port }}
+  parentRefs:
+  - kind: Gateway
+    name: {{ .Values.gatewayApi.name }}
+    namespace: {{ .Values.gatewayApi.namespace }}
+{{- end }}

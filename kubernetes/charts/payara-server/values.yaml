@@ -1,0 +1,75 @@
+nameOverride: ""
+fullnameOverride: ""
+
+server:
+  replicaCount: 1
+  
+  image:
+    repository: kdsda/payara-server-full
+    pullPolicy: IfNotPresent
+    tag: ""
+  imagePullSecrets: []
+  
+  consul:
+    connectInjectEnabled: false
+
+  podAnnotations: {}
+
+  serviceAccount:
+    create: true
+    name: ""
+
+  httpService:
+    create: true
+    type: ClusterIP
+    port: 8080
+    annotations: {}
+
+  consoleService:
+    create: false
+    type: ClusterIP
+    port: 4848
+    annotations: {}
+    debugPort:
+      enabled: false
+      port: 9009
+
+  resources: {}
+  # requests:
+  #   cpu: 100m
+  #   memory: 384Mi
+  # limits:
+  #   cpu: 1000m
+  #   memory: 8192Mi
+
+  env: []
+    
+  preBootCommands: ""
+  postBootCommands: ""
+  logBackXml: ""
+
+initContainer:
+  create: true
+
+  image:
+    repository: kdsda/ansible
+    pullPolicy: IfNotPresent
+    tag: "2023.23"
+  imagePullSecrets: []
+
+  mavenCredentials:
+    url: ""
+    username: ""
+    password: ""
+
+  mavenArtifacts: []
+  #- name: ""
+  #  repository: ""
+  #  group: ""
+  #  extension: ""
+  #  version: ""
+
+gatewayApi:
+  enabled: false
+  name: consul-api-gateway
+  namespace: consul

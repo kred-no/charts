@@ -1,0 +1,16 @@
+{{- if .Values.gatewayApi.enabled }}
+apiVersion: gateway.networking.k8s.io/v1alpha2
+kind: ReferenceGrant
+
+metadata:
+  name: gateway-api-reference-grant
+
+spec:
+  from:
+  - group: gateway.networking.k8s.io
+    kind: HTTPRoute
+    namespace: {{ .Values.gatewayApi.namespace }}
+  to:
+  - group: ""
+    kind: Service
+{{- end }}
