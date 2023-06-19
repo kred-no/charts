@@ -3,61 +3,124 @@ kind: StatefulSet
 
 metadata:
   name: {{ include "activemq.fullname" . }}
-  labels:
-    {{- include "activemq.labels" . | nindent 4 }}
+  namespace: {{ .Release.Namespace | quote }}
 
 spec:
-  {{- if not .Values.autoscaling.enabled }}
-  replicas: {{ .Values.replicaCount }}
-  {{- end }}
   selector:
     matchLabels:
       {{- include "activemq.selectorLabels" . | nindent 6 }}
+  replicas: {{ .Values.replicas }}
   template:
     metadata:
-      {{- with .Values.podAnnotations }}
-      annotations:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
       labels:
         {{- include "activemq.selectorLabels" . | nindent 8 }}
-    spec:
-      {{- with .Values.imagePullSecrets }}
-      imagePullSecrets:
+      annotations:
+        'consul.hashicorp.com/connect-inject': '{{ .Values.consul.meshEnabled }}'
+        'consul.hashicorp.com/connect-service': '{{ include "activemq.fullname" . }}'
+        'consul.hashicorp.com/connect-service-port': '{{ .Values.service.port }}'
+      {{- with .Values.podAnnotations }}
         {{- toYaml . | nindent 8 }}
       {{- end }}
+      
+    spec:
       serviceAccountName: {{ include "activemq.serviceAccountName" . }}
-      securityContext:
-        {{- toYaml .Values.podSecurityContext | nindent 8 }}
       containers:
-      - name: {{ .Chart.Name }}
-        securityContext:
-          {{- toYaml .Values.securityContext | nindent 12 }}
+      - name: activemq
         image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
         imagePullPolicy: {{ .Values.image.pullPolicy }}
+        env:
+        - name: ACTIVEMQ_HOME
+          value: /opt/activemq
+        - name: ACTIVEMQ_CONF
+          value: /activemq/config
+        - name: ACTIVEMQ_DATA
+          value: /activemq/data
+        #- name: ACTIVEMQ_TMP
+        #  value: /activemq/tmp
         ports:
-        - name: auto
+        - name: auto-amq
           containerPort: {{ .Values.service.port }}
           protocol: TCP
-        livenessProbe:
-          httpGet:
-            path: /
-            port: http
-        readinessProbe:
-          httpGet:
-            path: /
-            port: http
+        {{- if .Values.ui.enabled }}
+        - name: ui-amq
+          containerPort: {{ .Values.ui.port }}
+          protocol: TCP
+        {{- end }}
         resources:
           {{- toYaml .Values.resources | nindent 12 }}
-      {{- with .Values.nodeSelector }}
-      nodeSelector:
-        {{- toYaml . | nindent 8 }}
+        volumeMounts:
+        - name: activemq-data
+          mountPath: /activemq/data
+        - name: activemq-config
+          mountPath: /activemq/config/activemq.xml
+          subPath: activemq.xml
+        - name: activemq-config
+          mountPath: /activemq/config/jetty.xml
+          subPath: jetty.xml
+        - name: activemq-config
+          mountPath: /activemq/config/groups.properties
+          subPath: groups.properties
+        - name: activemq-secrets
+          mountPath: /activemq/config/credentials.properties
+          subPath: credentials.properties
+        - name: activemq-secrets
+          mountPath: /activemq/config/jetty-realm.properties
+          subPath: jetty-realm.properties
+        - name: activemq-secrets
+          mountPath: /activemq/config/users.properties
+          subPath: users.properties
+      {{- if .Values.metrics.enabled }}
+      - name: telegraf
+        image: "{{ .Values.metrics.image.repository }}:{{ .Values.metrics.image.tag }}"
+        imagePullPolicy: {{ .Values.metrics.image.pullPolicy }}
+        ports:
+        - name: metrics
+          containerPort: {{ .Values.metrics.port }}
+          protocol: TCP
+        volumeMounts:
+        - name: activemq-secrets
+          mountPath: /etc/telegraf/telegraf.conf
+          subPath: telegraf.conf
       {{- end }}
-      {{- with .Values.affinity }}
-      affinity:
-        {{- toYaml . | nindent 8 }}
+      terminationGracePeriodSeconds: 10
+      volumes:
+      - name: activemq-config
+        configMap:
+          name: {{ printf "%s-config" (include "activemq.fullname" .) }}
+          items:
+          - key: activemq.xml
+            path: activemq.xml
+          - key: jetty.xml
+            path: jetty.xml
+          - key: groups.properties
+            path: groups.properties
+      - name: activemq-secrets
+        secret:
+          secretName: {{ printf "%s-secrets" (include "activemq.fullname" .) }}
+          optional: false
+          items:
+          - key: credentials.properties
+            path: credentials.properties
+          - key: jetty-realm.properties
+            path: jetty-realm.properties
+          - key: users.properties
+            path: users.properties
+          {{- if .Values.metrics.enabled }}
+          - key: telegraf.conf
+            path: telegraf.conf
+          {{- end }}
+  volumeClaimTemplates:
+  - metadata:
+      name: activemq-data
+      namespace: {{ .Release.Namespace | quote }}
+    spec:
+      accessModes:
+      {{- range .Values.persistence.accessModes }}
+      - {{ . | quote }}
       {{- end }}
-      {{- with .Values.tolerations }}
-      tolerations:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
+      resources:
+        requests:
+          storage: {{ .Values.persistence.size | quote }}
+  persistentVolumeClaimRetentionPolicy: # v1.27 [beta] | Delete | Retain
+    whenDeleted: {{ .Values.persistence.retentionPolicy.whenDeleted }}
+    whenScaled: {{ .Values.persistence.retentionPolicy.whenScaled }}

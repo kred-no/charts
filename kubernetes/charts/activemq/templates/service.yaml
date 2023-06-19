@@ -3,15 +3,32 @@ kind: Service
 
 metadata:
   name: {{ include "activemq.fullname" . }}
-  labels:
-    {{- include "activemq.labels" . | nindent 4 }}
+  namespace: {{ .Release.Namespace | quote }}
+  {{- if .Values.metrics.enabled }}
+  annotations:
+  {{- with .Values.metrics.serviceAnnotations }}
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  {{- end }}
 
 spec:
   type: {{ .Values.service.type }}
   ports:
-  - port: {{ .Values.service.port }}
-    targetPort: auto
+  - name: auto-amq
     protocol: TCP
-    name: auto
+    port: {{ .Values.service.port }}
+    targetPort: auto-amq
+  {{- if .Values.ui.enabled }}
+  - name: ui-amq
+    protocol: TCP
+    port: {{ .Values.ui.port }}
+    targetPort: ui-amq
+  {{- end }}
+  {{- if .Values.metrics.enabled }}
+  - name: metrics
+    protocol: TCP
+    port: {{ .Values.metrics.port }}
+    targetPort: metrics
+  {{- end }}
   selector:
     {{- include "activemq.selectorLabels" . | nindent 4 }}
