@@ -3,22 +3,17 @@ fullnameOverride: ""
 
 replicaCount: 1
 
+config:
+  admin:
+    username: admin
+    password: admin
+  guest:
+    password: guest
+
 image:
   repository: ghcr.io/kreditorforeningens-driftssentral-da/container-image-activemq
   pullPolicy: IfNotPresent
   tag: ""
-
-imagePullSecrets: []
-nameOverride: ""
-fullnameOverride: ""
-
-podAnnotations: {}
-
-consul:
-  meshEnabled: false
-  intentions: []
-  # - name: xxx
-  #   action: allow # | deny
 
 serviceAccount:
   create: true
@@ -29,6 +24,8 @@ serviceAccount:
 service:
   type: ClusterIP
   port: 5671
+
+podAnnotations: {}
 
 resources:
   requests:
@@ -50,15 +47,14 @@ ui:
   enabled: true
   port: 8161
 
-config:
-  admin:
-    username: admin
-    password: admin
-  guest:
-    password: guest
+consul:
+  meshEnabled: false
+  intentions: []
+  # - name: xxx
+  #   action: allow # | deny
 
 metrics:
-  enabled: true
+  enabled: false
   image:
     repository: telegraf
     tag: alpine

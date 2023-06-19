@@ -7,10 +7,10 @@ metadata:
   labels: {{- include "activemq.labels" . | nindent 4 }}
 
 data:
-{{- with .Files.Glob "configs/tpl-activemq/*" }}
-{{ tpl .AsConfig $ | nindent 2 }}
+{{- with .Files.Glob "configs/raw/*" }}
+{{ .AsConfig | nindent 2 }}
 {{- end }}
 
-{{- with .Files.Glob "configs/activemq/*" }}
-{{ .AsConfig | nindent 2 }}
+{{- with .Files.Glob "configs/templates/*" }}
+{{ tpl .AsConfig $ | nindent 2 }}
 {{- end }}
