@@ -1,9 +1,26 @@
 {{- if .Values.gatewayApi.enabled }}
+apiVersion: gateway.networking.k8s.io/v1alpha2
+kind: ReferenceGrant
+
+metadata:
+  name: gateway-api-reference-grant
+  namespace: {{ .Release.Namespace | quote }}
+
+spec:
+  from:
+  - group: gateway.networking.k8s.io
+    kind: HTTPRoute
+    namespace: {{ .Values.gatewayApi.namespace }}
+  to:
+  - group: ""
+    kind: Service
+---
 apiVersion: gateway.networking.k8s.io/v1beta1
 kind: HTTPRoute
 
 metadata:
   name: {{ include "payara-server.fullname" . }}-route
+  namespace: {{ .Release.Namespace | quote }}
   labels:
     {{- include "payara-server.labels" . | nindent 4 }}
 

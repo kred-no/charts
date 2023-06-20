@@ -1,4 +1,5 @@
-# Charts
+# Charts (Public)
+
 This repo contains:
 
   * Helm-charts, for Kubernetes
@@ -26,4 +27,11 @@ This repo contains:
 
 ```bash
 # Nomad-Pack
+```
+
+## Tips
+
+```bash
+# List all pods, except in flux/kube-system
+kubectl get pods -A --field-selector=metadata.namespace!=kube-system,metadata.namespace!=flux-system
 ```

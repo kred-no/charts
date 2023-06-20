@@ -1,0 +1,65 @@
+# Ansible Playbook for downloading from Maven repository
+- hosts: 127.0.0.1
+  gather_facts: false
+
+  tasks:
+  -
+    name: ActiveMQ Client [v5.18.1]
+    ansible.builtin.get_url:
+      url: https://repo1.maven.org/maven2/org/apache/activemq/activemq-rar/5.18.1/activemq-rar-5.18.1.rar
+      checksum: sha1:e8e8cb89dc2eaddab416c659d6a46a023b33a538
+      dest: /maven/activemq-rar.rar
+      mode: '0755'
+  - 
+    name: Postgres Java Database Connectivity Driver [v42.6.0]
+    ansible.builtin.get_url:
+      url: https://repo1.maven.org/maven2/org/postgresql/postgresql/42.6.0/postgresql-42.6.0.jar
+      checksum: sha1:7614cfce466145b84972781ab0079b8dea49e363
+      dest: /maven/postgres-jdbc.jar
+      mode: '0755'
+  - 
+    name: Microsoft SQL Java Database Connectivity Driver [v11.2.3]
+    ansible.builtin.get_url:
+      url: https://repo1.maven.org/maven2/com/microsoft/sqlserver/mssql-jdbc/11.2.3.jre17/mssql-jdbc-11.2.3.jre17.jar
+      checksum: sha1:cc5c8ac8f5bcfd16c40f2723a190f372aeb77609
+      dest: /maven/mssql-jdbc.jar
+      mode: '0755'
+  - 
+    name: Logstash Logback Encoder [v7.3]
+    ansible.builtin.get_url:
+      url: https://repo1.maven.org/maven2/net/logstash/logback/logstash-logback-encoder/7.3/logstash-logback-encoder-7.3.jar
+      checksum: sha1:384f46df49a9b06bf2058648df20b3c83e5f8dd4
+      dest: /maven/logstash-logback-encoder.jar
+      mode: '0755'
+  - 
+    name: Payara Logback Libraries [v1.0.0]
+    ansible.builtin.get_url:
+      url: https://repo1.maven.org/maven2/io/github/goodees/payara-logback-libs/1.0.0/payara-logback-libs-1.0.0.jar
+      checksum: sha1:1551253f21b162679acdaade59c0a7b006de7446
+      dest: /maven/payara-logback-libs.jar
+      mode: '0755'
+  - 
+    name: Payara Logback Delegation [v1.0.0]
+    ansible.builtin.get_url:
+      url: https://repo1.maven.org/maven2/io/github/goodees/payara-logback-delegation/1.0.0/payara-logback-delegation-1.0.0.jar
+      checksum: sha1:772e2f2e3fe528be72b84149f8ca5b03e902d12c
+      dest: /maven/payara-logback-delegation.jar
+      mode: '0755'
+  -
+    name: Maven Artifact Download
+    community.general.maven_artifact:
+      dest: "/maven/{{ item.name }}.{{ item.extension }}"
+      repository_url: "{{ lookup('ansible.builtin.env', 'repository_url') }}/{{ item.repository }}"
+      username: "{{ lookup('ansible.builtin.env', 'repository_username') }}"
+      password: "{{ lookup('ansible.builtin.env', 'repository_password') }}"
+      group_id: "{{ item.group }}"
+      artifact_id: "{{ item.name }}"
+      extension: "{{ item.extension }}"
+      version: "{{ item.version }}"
+      mode: 0644
+      keep_name: false
+      verify_checksum: always
+    loop: "{{ artifacts }}"
+  -
+    ansible.builtin.debug:
+      msg: "Ansible tasks completed!"

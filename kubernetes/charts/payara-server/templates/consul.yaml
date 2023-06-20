@@ -4,6 +4,7 @@ kind: ServiceDefaults
 
 metadata:
   name: {{ include "payara-server.fullname" . }}
+  namespace: {{ .Release.Namespace | quote }}
 
 spec:
   protocol: http
@@ -13,6 +14,7 @@ kind: ServiceIntentions
 
 metadata:
   name: allow-gateway-api-to-{{ include "payara-server.fullname" . }}
+  namespace: {{ .Release.Namespace | quote }}
 
 spec:
   destination:

@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Doc: http://logback.qos.ch/manual/configuration.html -->
+<configuration scan="true">
+  <jmxConfigurator />
+  <shutdownHook />
+  <!-- propagate changes to java.util.logging -->
+  <contextListener class="ch.qos.logback.classic.jul.LevelChangePropagator">
+  <resetJUL>true</resetJUL>
+  </contextListener>
+  <appender name="ROLLING" class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <file>/alloc/logs/kos.log</file>
+    <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+    <fileNamePattern>/alloc/logs/kos-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+    <maxFileSize>10MB</maxFileSize>
+    <maxHistory>10</maxHistory>
+    <totalSizeCap>5GB</totalSizeCap>
+    </rollingPolicy>
+    <encoder class="net.logstash.logback.encoder.LogstashEncoder">
+      <fieldNames>	  
+      <timestamp>@timestamp</timestamp>
+      <version>@version</version>
+      <level>level</level>
+      <loglevel>loglevel</loglevel>	  
+      <message>message</message>
+      <applicationName>applicationName</applicationName>
+      <class>class</class>
+      <method>method</method>
+      <filename>filename</filename>
+      <hostname>[ignore]</hostname>
+      <ip>[ignore]</ip>
+      <logger_name>[ignore]</logger_name>
+      <thread_name>[ignore]</thread_name>
+      <tsNs>tsNs</tsNs>
+    </fieldNames>
+    </encoder>
+  </appender>
+  <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <file>/alloc/logs/payara.log</file>
+    <!-- Outdated, replace policy -->
+    <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+    <fileNamePattern>/alloc/logs/payara.%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+    <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+    <maxFileSize>10MB</maxFileSize>
+    </timeBasedFileNamingAndTriggeringPolicy>
+    <maxHistory>10</maxHistory>
+    </rollingPolicy>
+    <encoder>
+    <pattern>[%d{ISO8601}] [%t] [%4p] [%logger]: %m%n</pattern>
+    </encoder>
+  </appender>
+  <logger name="no.kds" level="${LOGBACK_LOGLEVEL}">
+    <appender-ref ref="ROLLING" />
+  </logger>
+  <root level="INFO">
+    <appender-ref ref="FILE" />
+  </root>
+</configuration>

@@ -1,15 +1,3 @@
-{{- if .Values.consul.meshEnabled }}
-apiVersion: consul.hashicorp.com/v1alpha1
-kind: ServiceDefaults
-
-metadata:
-  name: {{ printf "%s-defaults" (include "activemq.fullname" .) }}
-  namespace: {{ .Release.Namespace | quote }}
-  labels: {{- include "activemq.labels" . | nindent 4 }}
-
-spec:
-  protocol: tcp
-
 {{- if .Values.consul.intentions }}
 ---
 apiVersion: consul.hashicorp.com/v1alpha1
@@ -28,6 +16,4 @@ spec:
   - name: {{ $svc.name }}
     action: {{ default "allow" $svc.action }}
   {{- end }}
-{{- end }}
-
 {{- end }}

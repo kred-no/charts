@@ -1,8 +1,15 @@
+{{- $consulAnnotations := dict
+  "consul.hashicorp.com/connect-inject" (.Values.consul.meshEnabled|quote)
+  "consul.hashicorp.com/connect-service" (include "payara-server.fullname" .)
+  "consul.hashicorp.com/connect-service-port" (.Values.server.httpService.port|quote)
+}}
+
 apiVersion: apps/v1
 kind: Deployment
 
 metadata:
   name: {{ include "payara-server.fullname" . }}
+  namespace: {{ .Release.Namespace | quote }}
   labels:
     {{- include "payara-server.labels" . | nindent 4 }}
 
@@ -13,13 +20,10 @@ spec:
       {{- include "payara-server.selectorLabels" . | nindent 6 }}
   template:
     metadata:
+      {{- with merge .Values.server.podAnnotations $consulAnnotations }}
       annotations:
-        'consul.hashicorp.com/connect-inject': {{ .Values.server.consul.connectInjectEnabled | quote }}
-        'consul.hashicorp.com/connect-service': {{ include "payara-server.fullname" . | quote }}
-        'consul.hashicorp.com/connect-service-port': {{ .Values.server.httpService.port | quote }}
-        {{- with .Values.server.podAnnotations }}
         {{- toYaml . | nindent 8 }}
-        {{- end }}
+      {{- end }}
       labels:
         {{- include "payara-server.selectorLabels" . | nindent 8 }}
     spec:
@@ -31,32 +35,32 @@ spec:
       {{- if .Values.initContainer.create }}
       initContainers:
       - name: ansible
-        image: kdsda/ansible:2023.23
+        image: "{{ .Values.initContainer.image.repository }}:{{ .Values.initContainer.image.tag }}"
         envFrom:
         - secretRef:
-            name: {{ include "payara-server.fullname" . }}-init-env
+            name: {{ include "payara-server.fullname" . }}-secrets
         env:
         - name: RESOURCE_FOLDER
           value: /maven
         - name: SCRIPT_DIR
           value: /scripts
-        command: ["/bin/bash", "-c", "/scripts/init.sh"]
+        command: ["/bin/bash", "-c", "/scripts/ansible-entrypoint.sh"]
         volumeMounts:
         -
           name: maven
           mountPath: /maven
         -
-          name: payara-init-config
-          mountPath: /scripts/init.sh
-          subPath: init.sh
+          name: payara-config
+          mountPath: /scripts/ansible-entrypoint.sh
+          subPath: ansible-entrypoint.sh
         -
-          name: payara-init-config
-          mountPath: /scripts/playbook.yaml
-          subPath: playbook.yaml
+          name: payara-config
+          mountPath: /scripts/ansible-playbook.yaml
+          subPath: ansible-playbook.yaml
         -
-          name: payara-init-config
-          mountPath: /scripts/artifacts.yaml
-          subPath: artifacts.yaml
+          name: payara-config
+          mountPath: /scripts/ansible-artifacts.yaml
+          subPath: ansible-artifacts.yaml
       {{- end }}
       containers:
       - name: {{ .Chart.Name }}
@@ -64,7 +68,7 @@ spec:
         imagePullPolicy: {{ .Values.server.image.pullPolicy }}
         envFrom:
         - secretRef:
-            name: {{ include "payara-server.fullname" . }}-env
+            name: {{ include "payara-server.fullname" . }}-secrets
         env: {{- with .Values.server.env }}
           {{- toYaml . | nindent 8 }}
         {{- end }}
@@ -107,16 +111,12 @@ spec:
             port: {{ .Values.server.httpService.port }}
           failureThreshold: 3
           periodSeconds: 15
-        #readinessProbe:
-        #  httpGet:
-        #    path: /
-        #    port: http
         resources:
           {{- toYaml .Values.server.resources | nindent 10 }}
       volumes:
       - name: payara-config
         configMap:
-          name: {{ include "payara-server.fullname" . }}-config
+          name: {{ include "payara-server.fullname" . }}-configs
           defaultMode: 0777
           items:
           - key: logback.xml
@@ -125,17 +125,14 @@ spec:
             path: preboot-commands.asadmin
           - key: postboot-commands.asadmin
             path: postboot-commands.asadmin
-      - name: payara-init-config
-        configMap:
-          name: {{ include "payara-server.fullname" . }}-init-config
-          defaultMode: 0777
-          items:
-          - key: init.sh
-            path: init.sh
-          - key: playbook.yaml
-            path: playbook.yaml
-          - key: artifacts.yaml
-            path: artifacts.yaml
+          {{- if .Values.initContainer.create }}
+          - key: ansible-entrypoint.sh
+            path: ansible-entrypoint.sh
+          - key: ansible-playbook.yaml
+            path: ansible-playbook.yaml
+          - key: ansible-artifacts.yaml
+            path: ansible-artifacts.yaml
+          {{- end }}
       - name: maven
         emptyDir: {}
       #terminationGracePeriodSeconds: 10

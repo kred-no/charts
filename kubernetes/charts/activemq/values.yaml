@@ -47,6 +47,24 @@ ui:
   enabled: true
   port: 8161
 
+gatewayApi:
+  enabled: false
+  httpRoute: {}
+  #  parentRefs:
+  #    kind: Gateway
+  #    name: consul-api-gateway
+  #    namespace: consul
+  #  hostnames: ["localhost"]
+  #  rules:
+  #  - matches:
+  #    - path:
+  #        type: PathPrefix
+  #        value: /v1/public
+  #    backendRefs:
+  #    - kind: Service
+  #      name: payara-server
+  #      port: 80
+
 consul:
   meshEnabled: false
   intentions: []

@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: ConfigMap
+
+metadata:
+  name: {{ printf "%s-configs" (include "payara-server.fullname" .) }}
+  namespace: {{ .Release.Namespace | quote }}
+  labels: {{- include "payara-server.labels" . | nindent 4 }}
+
+data:
+  preboot-commands.asadmin: |-
+    {{- tpl .Values.preBootCommands . | nindent 4 }}
+  
+  postboot-commands.asadmin: |-
+    {{- tpl .Values.postBootCommands . | nindent 4 }}
+  
+{{- with .Files.Glob "configs/*" }}
+{{ .AsConfig | nindent 2 }}
+{{- end }}
+
+{{- with .Files.Glob "configs/tpl/*" }}
+{{ tpl .AsConfig $ | nindent 2 }}
+{{- end }}
