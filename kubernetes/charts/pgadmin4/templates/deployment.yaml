@@ -1,18 +1,16 @@
 apiVersion: apps/v1
 kind: Deployment
-
 metadata:
-  name: {{ include "postgres.fullname" . }}
+  name: {{ include "pgadmin4.fullname" . }}
   labels:
-    {{- include "postgres.labels" . | nindent 4 }}
-
+    {{- include "pgadmin4.labels" . | nindent 4 }}
 spec:
   {{- if not .Values.autoscaling.enabled }}
   replicas: {{ .Values.replicaCount }}
   {{- end }}
   selector:
     matchLabels:
-      {{- include "postgres.selectorLabels" . | nindent 6 }}
+      {{- include "pgadmin4.selectorLabels" . | nindent 6 }}
   template:
     metadata:
       {{- with .Values.podAnnotations }}
@@ -20,13 +18,13 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       labels:
-        {{- include "postgres.selectorLabels" . | nindent 8 }}
+        {{- include "pgadmin4.selectorLabels" . | nindent 8 }}
     spec:
       {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      serviceAccountName: {{ include "postgres.serviceAccountName" . }}
+      serviceAccountName: {{ include "pgadmin4.serviceAccountName" . }}
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       containers:

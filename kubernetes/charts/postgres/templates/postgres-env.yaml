@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Secret
+type: Opaque
+
+metadata:
+  name: {{ printf "%s-env" (include "postgres.fullname" .) }}
+  namespace: {{ .Release.Namespace | quote }}
+  labels: {{- include "postgres.labels" . | nindent 4 }}
+
+data:
+{{- range .Values.server.extraEnv }}
+  {{ .name }}: {{ .value | b64enc }}
+{{- end }}

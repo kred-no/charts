@@ -1,0 +1,8 @@
+-
+  op: add
+  path: /spec/template/metadata/annotations/consul.hashicorp.com~1connect-service
+  value: pgadmin4
+-
+  op: add
+  path: /spec/template/metadata/annotations/consul.hashicorp.com~1connect-service-port
+  value: '80'

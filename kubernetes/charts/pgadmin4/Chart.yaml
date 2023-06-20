@@ -1,7 +1,7 @@
 apiVersion: v2
-name: postgres
+name: pgadmin4
 icon: https://www.kred.no/wp-content/uploads/2023/05/cropped-Kreditorforeningen-32x32.png
 description: A Helm chart for Kubernetes
 type: application
 version: 0.1.0
-appVersion: "15.3-alpine"
+appVersion: "1.16.0"
