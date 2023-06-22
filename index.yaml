@@ -1,0 +1,63 @@
+apiVersion: v1
+entries:
+  activemq:
+  - apiVersion: v2
+    appVersion: 5.18.1
+    created: "2023-06-22T10:47:57.321162734Z"
+    description: A Helm chart for Kubernetes
+    digest: 55b95a7a0f45d90caf9a28b9bf07e639d121a08b1daaaca19d77c400bc800606
+    icon: https://www.kred.no/wp-content/uploads/2023/05/cropped-Kreditorforeningen-32x32.png
+    name: activemq
+    type: application
+    urls:
+    - https://github.com/kred-no/charts/releases/download/activemq-0.1.0/activemq-0.1.0.tgz
+    version: 0.1.0
+  jetty:
+  - apiVersion: v2
+    appVersion: 17.0.7
+    created: "2023-06-22T10:47:57.54485019Z"
+    description: A Helm chart for Kubernetes
+    digest: 3c6148bb74c62f0f1d58cd35fb0a6b09b4a03f28620cba1f218c84236d78b059
+    icon: https://www.kred.no/wp-content/uploads/2023/05/cropped-Kreditorforeningen-32x32.png
+    name: jetty
+    type: application
+    urls:
+    - https://github.com/kred-no/charts/releases/download/jetty-0.1.0/jetty-0.1.0.tgz
+    version: 0.1.0
+  payara-server:
+  - apiVersion: v2
+    appVersion: 5.2022.5-jdk17
+    created: "2023-06-22T10:47:57.765528625Z"
+    description: A Helm chart for Kubernetes
+    digest: 582274d7072e3fecd4dc5ee1b4b2adbece2fbd6e8364205170b011637e5dbb46
+    icon: https://www.kred.no/wp-content/uploads/2023/05/cropped-Kreditorforeningen-32x32.png
+    name: payara-server
+    type: application
+    urls:
+    - https://github.com/kred-no/charts/releases/download/payara-server-0.1.0/payara-server-0.1.0.tgz
+    version: 0.1.0
+  pgadmin4:
+  - apiVersion: v2
+    appVersion: "7.3"
+    created: "2023-06-22T10:47:57.963364102Z"
+    description: A Helm chart for Kubernetes
+    digest: 3fd5ca5ffada3f062a565670547360349c57ff0eec45891964848aacfee81940
+    icon: https://www.kred.no/wp-content/uploads/2023/05/cropped-Kreditorforeningen-32x32.png
+    name: pgadmin4
+    type: application
+    urls:
+    - https://github.com/kred-no/charts/releases/download/pgadmin4-0.1.0/pgadmin4-0.1.0.tgz
+    version: 0.1.0
+  postgres:
+  - apiVersion: v2
+    appVersion: 15.3-alpine
+    created: "2023-06-22T10:47:58.173403163Z"
+    description: A Helm chart for Kubernetes
+    digest: 65ba9fb843ca20a083bb26d7dd2246042aaa4fff7c90f758656297a4744abab1
+    icon: https://www.kred.no/wp-content/uploads/2023/05/cropped-Kreditorforeningen-32x32.png
+    name: postgres
+    type: application
+    urls:
+    - https://github.com/kred-no/charts/releases/download/postgres-0.1.0/postgres-0.1.0.tgz
+    version: 0.1.0
+generated: "2023-06-22T10:47:58.173466163Z"
