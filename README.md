@@ -1,6 +1,8 @@
 # Charts (Public)
 
-This repo contains:
+Chart Repository: https://kred-no.github.io/charts/
+
+Content:
 
   * Helm-charts, for Kubernetes
   * kustomize files, for Kubernetes
@@ -15,20 +17,6 @@ This repo contains:
 | payara-server | [v0.1.0](./kubernetes/charts/payara-server/README.md) | N/A | N/A | 
 | pgadmin4      | [v0.1.0](./kubernetes/charts/pgadmin4/README.md)      | N/A | N/A | 
 | postgres      | [v0.1.0](./kubernetes/charts/postgres/README.md)      | N/A | N/A | 
-
-## Usage
-
-```bash
-# Helm
-```
-
-```bash
-# Kustomize
-```
-
-```bash
-# Nomad-Pack
-```
 
 ## Tips
 

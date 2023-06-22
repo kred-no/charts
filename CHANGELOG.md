@@ -9,3 +9,4 @@
       - [activemq](./kubernetes/charts/activemq/)
       - [jetty](./kubernetes/charts/jetty/)
       - [pgadmin4](./kubernetes/charts/pgadmin4/)
+  1. Created Github Action for Chart build & release

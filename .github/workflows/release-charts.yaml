@@ -3,11 +3,11 @@ name: Release Charts
 on:
   workflow_dispatch:
 
-  #push:
-  #  tags:
-    #- 'activemq-v*.*.*'
-    #branches:
-    #- main
+  push:
+    #tags:
+    #- '*-v*.*.*' # <ChartName>-v<ChartVersion>
+    branches:
+    - main
 
 jobs:
   release:
