@@ -30,8 +30,8 @@ jobs:
       name: Run 'Chart Releaser' action
       uses: helm/chart-releaser-action@v1.5.0
       with:
-        charts_dir: ./kubernetes/charts/activemq
-        config: ./kubernetes/charts/cr.yaml
+        charts_dir: /kubernetes/charts
+        #config: /kubernetes/charts/cr.yaml
         skip_existing: true
       env:
         CR_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
