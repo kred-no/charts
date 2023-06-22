@@ -1,3 +1,9 @@
+{{- $consulAnnotations := dict
+  "consul.hashicorp.com/connect-inject" (.Values.consul.meshEnabled|quote)
+  "consul.hashicorp.com/connect-service" (include "postgres.fullname" .)
+  "consul.hashicorp.com/connect-service-port" (.Values.server.service.port|quote)
+}}
+
 apiVersion: apps/v1
 kind: StatefulSet
 
@@ -14,7 +20,7 @@ spec:
       {{- include "postgres.selectorLabels" . | nindent 6 }}
   template:
     metadata:
-      {{- with .Values.server.podAnnotations }}
+      {{- with merge .Values.server.podAnnotations $consulAnnotations }}
       annotations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
@@ -32,11 +38,11 @@ spec:
         imagePullPolicy: {{ .Values.server.image.pullPolicy }}
         env:
         - name: POSTGRES_PASSWORD
-          value: {{ .Values.server.config.password }}
+          value: {{ .Values.server.credentials.password }}
         - name: POSTGRES_USER
-          value: {{ .Values.server.config.username }}
+          value: {{ .Values.server.credentials.username }}
         - name: POSTGRES_DB
-          value: {{ .Values.server.config.database }}
+          value: {{ .Values.server.credentials.database }}
         - name: PGDATA
           value: {{ .Values.server.dataDir }}
         envFrom:

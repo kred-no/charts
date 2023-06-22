@@ -8,6 +8,10 @@ metadata:
   labels: {{- include "postgres.labels" . | nindent 4 }}
 
 data:
+{{- range .Values.server.env }}
+  {{- .name | nindent 2 }}: {{ .value | b64enc }}
+{{- end }}
+
 {{- range .Values.server.extraEnv }}
-  {{ .name }}: {{ .value | b64enc }}
+  {{- .name | nindent 2 }}: {{ .value | b64enc }}
 {{- end }}

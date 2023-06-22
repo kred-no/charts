@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: ConfigMap
+
+metadata:
+  name: {{ printf "%s-configs" (include "pgadmin4.fullname" .) }}
+  namespace: {{ .Release.Namespace | quote }}
+  labels: {{- include "pgadmin4.labels" . | nindent 4 }}
+
+binaryData:
+{{- .Values.serversFilePath | base | nindent 2 }}: |-
+{{- .Values.serversFileContent | b64enc | nindent 4 }}
+
+{{- with .Files.Glob "files/config/*" }}
+{{ .AsConfig | b64enc | nindent 2 }}
+{{- end }}
+
+{{- with .Files.Glob "files/config-tpl/*" }}
+{{ tpl .AsConfig $ | b64enc | nindent 2 }}
+{{- end }}

@@ -1,0 +1,103 @@
+{{- $consulAnnotations := dict
+  "consul.hashicorp.com/connect-inject" (.Values.consul.meshEnabled|quote)
+  "consul.hashicorp.com/connect-service" (include "pgadmin4.fullname" .)
+  "consul.hashicorp.com/connect-service-port" (.Values.service.port|quote)
+}}
+
+apiVersion: apps/v1
+kind: Deployment
+
+metadata:
+  name: {{ include "pgadmin4.fullname" . }}
+  namespace: {{ .Release.Namespace | quote }}
+  labels:
+    {{- include "pgadmin4.labels" . | nindent 4 }}
+
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "pgadmin4.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with merge $consulAnnotations .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "pgadmin4.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "pgadmin4.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+      - name: {{ .Chart.Name }}
+        securityContext:
+          {{- toYaml .Values.securityContext | nindent 12 }}
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        env:
+        - name: PGADMIN_DEFAULT_EMAIL
+          value: {{ .Values.credentials.email  }}
+        - name: PGADMIN_DEFAULT_PASSWORD
+          value: {{ .Values.credentials.password  }}
+        - name: PGADMIN_SERVER_JSON_FILE
+          value: {{ .Values.serversFilePath  }}
+        {{- with .Values.extraEnv }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+        ports:
+        - name: http
+          containerPort: {{ .Values.service.port }}
+          protocol: TCP
+        startupProbe: # Failure => kill container; follow restart-policy
+          periodSeconds: 5
+          failureThreshold: 30 # 5*30=2m30s
+          httpGet:
+            path: /misc/ping
+            port: http
+        livenessProbe: # Failure => restart container
+          initialDelaySeconds: 5
+          periodSeconds: 30
+          failureThreshold: 3
+          successThreshold: 1
+          httpGet:
+            path: /misc/ping
+            port: http
+        readinessProbe: # Failure => unable to receive requests/traffic
+          initialDelaySeconds: 15
+          periodSeconds: 15
+          failureThreshold: 1
+          successThreshold: 1
+          httpGet:
+            path: /misc/ping
+            port: http
+        resources:
+          {{- toYaml .Values.resources | nindent 10 }}
+        volumeMounts:
+        - name: pgadmin4-config
+          mountPath: {{ .Values.serversFilePath  }}
+          subPath: {{ .Values.serversFilePath | base }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      volumes:
+      - name: pgadmin4-config
+        configMap:
+          name: {{ printf "%s-configs" (include "pgadmin4.fullname" .) }}
+          items:
+          - key: {{ .Values.serversFilePath | base }}
+            path: {{ .Values.serversFilePath | base }}

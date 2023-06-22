@@ -4,25 +4,22 @@ fullnameOverride: ""
 server:
   replicaCount: 1
   
-  config:
-    username: example
-    password: postgres
-    database: example
-    idit_db_args: null
-    init_db_waldir: null
-    auth_method: null
-  
   dataDir: /postgres/data/pgdata
-
+  
+  credentials:
+    username: postgres
+    password: postgres
+    database: null
+  
   dataPersistence:
     enabled: false
     storageClassName: default
     mountPath: /postgres/data
     size: 5Gi
-  
-  extraEnv:
-  - name: example
-    value: SomeValue
+ 
+  extraEnv: []
+  #- name: example
+  #  value: SomeValue
   
   image:
     registry: docker.io
@@ -54,3 +51,9 @@ server:
     enabled: false
   readinessProbe:
     enabled: true
+
+consul:
+  meshEnabled: false
+  intentions: []
+  #- name: pgadmin4
+  #  action: allow

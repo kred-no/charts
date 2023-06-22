@@ -1,0 +1,18 @@
+resources:
+- ../../base
+
+patches:
+- # Add consul annotations
+  target:
+    group: apps
+    version: v1
+    kind: Deployment
+    name: payara-server
+  path: patch-consul.yaml
+- # Override service port
+  target:
+    group: ""
+    version: v1
+    kind: Service
+    name: payara-server
+  path: patch-service.yaml
