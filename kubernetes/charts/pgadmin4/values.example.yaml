@@ -1,0 +1,43 @@
+# Chart: pgadmin4
+replicaCount: 1
+
+image:
+  repository: dpage/pgadmin4
+  tag: latest
+
+extraEnv:
+- name: hello
+  value: world
+
+credentials:
+  email: admin@pgadmin.net
+  password: LogMeIn
+
+consul:
+  meshEnabled: true
+
+serversFilePath: /pgadmin4/config/servers.json
+
+serversFileContent: |-
+  {
+    "Servers": {
+      "1": {
+        "Name": "Example Database 1",
+        "Group": "Example Server Group",
+        "Port": 5432,
+        "Username": "postgres",
+        "Host": "example-postgres-1.postgres.svc",
+        "SSLMode": "prefer",
+        "MaintenanceDB": "postgres"
+      },
+      "2": {
+        "Name": "Example Database 2",
+        "Group": "Example Server Group",
+        "Port": 5432,
+        "Username": "postgres",
+        "Host": "example-postgres-2.postgres.svc",
+        "SSLMode": "prefer",
+        "MaintenanceDB": "postgres"
+      }
+    }
+  }

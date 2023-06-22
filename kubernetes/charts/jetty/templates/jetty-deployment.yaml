@@ -1,0 +1,107 @@
+{{- $consulAnnotations := dict
+  "consul.hashicorp.com/connect-inject" (.Values.consul.meshEnabled|quote)
+  "consul.hashicorp.com/connect-service" (include "jetty.fullname" .)
+  "consul.hashicorp.com/connect-service-port" (.Values.service.port|quote)
+}}
+
+apiVersion: apps/v1
+kind: ReplicaSet
+
+metadata:
+  name: {{ include "jetty.fullname" . }}
+  namespace: {{ .Release.Namespace | quote }}
+  labels:
+    {{- include "jetty.labels" . | nindent 4 }}
+
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "jetty.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "jetty.selectorLabels" . | nindent 8 }}
+      
+      {{- with merge .Values.podAnnotations $consulAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+    spec:
+      serviceAccountName: {{ include "jetty.serviceAccountName" . }}
+      {{- if .Values.mavenDownload.enabled }}
+      initContainers:
+      - name: ansible
+        image: {{ .Values.mavenDownload.image.repository }}:{{ .Values.mavenDownload.image.tag }}
+        envFrom:
+        - secretRef:
+            name: {{ include "jetty.fullname" . }}-secrets
+        env:
+        - name: RESOURCE_FOLDER
+          value: /maven
+        - name: SCRIPT_DIR
+          value: /scripts
+        command: ["/bin/bash", "-c", "/scripts/init.sh"]
+        volumeMounts:
+        - name: maven
+          mountPath: /maven
+        - name: jetty-config
+          mountPath: /scripts/init.sh
+          subPath: init.sh
+        - name: jetty-config
+          mountPath: /scripts/playbook.yaml
+          subPath: playbook.yaml
+        - name: jetty-config
+          mountPath: /scripts/artifacts.yaml
+          subPath: artifacts.yaml
+      {{- end }}
+      containers:
+      - name: jetty
+        stdin: true
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+        {{- with .Values.env }}
+        env:
+          {{- toYaml . | nindent 8 }}
+        {{- end }}
+        ports:
+        - name: http
+          containerPort: {{ .Values.service.port }}
+          protocol: TCP
+        volumeMounts:
+        {{- if .Values.mavenDownload.enabled }}
+        - name: maven
+          mountPath: /maven
+        {{- end }}
+        - name: jetty-config
+          mountPath: /jetty/config.yaml
+          subPath: config.yaml
+        command: ["bash"]
+        #args: 
+        #- -jar
+        #- /maven/main.jar
+        #- server
+        #- /jetty/config.yml
+      volumes:
+      - name: jetty-config
+        configMap:
+          name: {{ printf "%s-config" (include "jetty.fullname" .) }}
+          items:
+          - key: config.yaml
+            path: config.yaml
+          {{- if .Values.mavenDownload.enabled }}
+          - key: ansible-artifacts.yaml
+            path: ansible-artifacts.yaml
+          - key: ansible-playbook.yaml
+            path: ansible-playbook.yaml
+          - key: ansible-entrypoint.sh
+            path: ansible-entrypoint.sh
+          {{- end }}
+      {{- if .Values.mavenDownload.enabled }}
+      - name: jetty-secrets
+        secret:
+          secretName: {{ printf "%s-secrets" (include "jetty.fullname" .) }}
+          optional: false
+          items:
+          - key: maven.env
+            path: maven.env
+      {{- end }}

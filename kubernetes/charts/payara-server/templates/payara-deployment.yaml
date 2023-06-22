@@ -1,0 +1,138 @@
+{{- $consulAnnotations := dict
+  "consul.hashicorp.com/connect-inject" (.Values.consul.meshEnabled|quote)
+  "consul.hashicorp.com/connect-service" (include "payara-server.fullname" .)
+  "consul.hashicorp.com/connect-service-port" (.Values.server.httpService.port|quote)
+}}
+
+apiVersion: apps/v1
+kind: Deployment
+
+metadata:
+  name: {{ include "payara-server.fullname" . }}
+  namespace: {{ .Release.Namespace | quote }}
+  labels:
+    {{- include "payara-server.labels" . | nindent 4 }}
+
+spec:
+  replicas: {{ .Values.server.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "payara-server.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with merge .Values.server.podAnnotations $consulAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "payara-server.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "payara-server.serviceAccountName" . }}
+      {{- if .Values.initContainer.create }}
+      initContainers:
+      - name: ansible
+        image: "{{ .Values.initContainer.image.repository }}:{{ .Values.initContainer.image.tag }}"
+        envFrom:
+        - secretRef:
+            name: {{ include "payara-server.fullname" . }}-secrets
+        env:
+        - name: RESOURCE_FOLDER
+          value: /maven
+        - name: SCRIPT_DIR
+          value: /scripts
+        command: ["/bin/bash", "-c", "/scripts/ansible-entrypoint.sh"]
+        volumeMounts:
+        -
+          name: maven
+          mountPath: /maven
+        -
+          name: payara-config
+          mountPath: /scripts/ansible-entrypoint.sh
+          subPath: ansible-entrypoint.sh
+        -
+          name: payara-config
+          mountPath: /scripts/ansible-playbook.yaml
+          subPath: ansible-playbook.yaml
+        -
+          name: payara-config
+          mountPath: /scripts/ansible-artifacts.yaml
+          subPath: ansible-artifacts.yaml
+      {{- end }}
+      containers:
+      - name: {{ .Chart.Name }}
+        image: "{{ .Values.server.image.repository }}:{{ .Values.server.image.tag | default .Chart.AppVersion }}"
+        imagePullPolicy: {{ .Values.server.image.pullPolicy }}
+        envFrom:
+        - secretRef:
+            name: {{ include "payara-server.fullname" . }}-secrets
+        env: {{- with .Values.server.env }}
+          {{- toYaml . | nindent 8 }}
+        {{- end }}
+        ports:
+        -
+          name: http
+          containerPort: {{ .Values.server.httpService.port }}
+          protocol: TCP
+        -
+          name: console
+          containerPort: {{ .Values.server.consoleService.port }}
+          protocol: TCP
+        -
+          name: debug
+          containerPort: {{ .Values.server.consoleService.debugPort.port }}
+          protocol: TCP
+        volumeMounts:
+        -
+          name: payara-config
+          mountPath: /payara/config/logback.xml
+          subPath: logback.xml
+        -
+          name: payara-config
+          mountPath: /payara/config/preboot-commands.asadmin
+          subPath: preboot-commands.asadmin
+        -
+          name: payara-config
+          mountPath: /payara/config/postboot-commands.asadmin
+          subPath: postboot-commands.asadmin
+        -
+          name: maven
+          mountPath: /maven
+        startupProbe:
+          tcpSocket:
+            port: {{ .Values.server.httpService.port }}
+          failureThreshold: 30
+          periodSeconds: 10
+        livenessProbe:
+          tcpSocket:
+            port: {{ .Values.server.httpService.port }}
+          failureThreshold: 3
+          periodSeconds: 15
+        resources:
+          {{- toYaml .Values.server.resources | nindent 10 }}
+      volumes:
+      - name: payara-config
+        configMap:
+          name: {{ include "payara-server.fullname" . }}-configs
+          defaultMode: 0777
+          items:
+          - key: logback.xml
+            path: logback.xml
+          - key: preboot-commands.asadmin
+            path: preboot-commands.asadmin
+          - key: postboot-commands.asadmin
+            path: postboot-commands.asadmin
+          {{- if .Values.initContainer.create }}
+          - key: ansible-entrypoint.sh
+            path: ansible-entrypoint.sh
+          - key: ansible-playbook.yaml
+            path: ansible-playbook.yaml
+          - key: ansible-artifacts.yaml
+            path: ansible-artifacts.yaml
+          {{- end }}
+      - name: maven
+        emptyDir: {}
+      #terminationGracePeriodSeconds: 10

@@ -1,0 +1,79 @@
+{{- $consulAnnotations := dict
+  "consul.hashicorp.com/connect-inject" (.Values.consul.meshEnabled|quote)
+  "consul.hashicorp.com/connect-service" (include "postgres.fullname" .)
+  "consul.hashicorp.com/connect-service-port" (.Values.server.service.port|quote)
+}}
+
+apiVersion: apps/v1
+kind: StatefulSet
+
+metadata:
+  name: {{ include "postgres.fullname" . }}
+  namespace: {{ .Release.Namespace | quote }}
+  labels:
+    {{- include "postgres.labels" . | nindent 4 }}
+
+spec:
+  replicas: {{ .Values.server.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "postgres.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with merge .Values.server.podAnnotations $consulAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "postgres.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.server.image.pullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "postgres.serviceAccountName" . }}
+      containers:
+      - name: {{ .Chart.Name }}
+        image: "{{ .Values.server.image.repository }}:{{ .Values.server.image.tag | default .Chart.AppVersion }}"
+        imagePullPolicy: {{ .Values.server.image.pullPolicy }}
+        env:
+        - name: POSTGRES_PASSWORD
+          value: {{ .Values.server.credentials.password }}
+        - name: POSTGRES_USER
+          value: {{ .Values.server.credentials.username }}
+        - name: POSTGRES_DB
+          value: {{ .Values.server.credentials.database }}
+        - name: PGDATA
+          value: {{ .Values.server.dataDir }}
+        envFrom:
+        - secretRef:
+            name: {{ include "postgres.fullname" . }}-env
+        ports:
+        - name: tcp-postgres
+          containerPort: {{ .Values.server.service.port }}
+          protocol: TCP
+        resources:
+          {{- toYaml .Values.server.resources | nindent 12 }}
+        volumeMounts:
+        - name: postgres-data
+          mountPath: {{ .Values.server.dataPersistence.mountPath }}
+      {{- if .Values.server.dataPersistence.enabled | not }}
+      volumes:
+      - name: postgres-data
+        emptyDir: {}
+      {{- end }}
+  {{- if .Values.server.dataPersistence.enabled }}
+  volumeClaimTemplates:
+  - metadata:
+      name: postgres-data
+      namespace: {{ .Release.Namespace | quote }}
+    spec:
+      accessModes:
+      - ReadWriteOnce
+      resources:
+        requests:
+          storage: {{ .Values.server.dataPersistence.size }}
+  persistentVolumeClaimRetentionPolicy:
+    whenDeleted: Retain
+    whenScaled: Delete
+  {{- end }}

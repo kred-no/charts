@@ -1,0 +1,59 @@
+nameOverride: ""
+fullnameOverride: ""
+
+server:
+  replicaCount: 1
+  
+  dataDir: /postgres/data/pgdata
+  
+  credentials:
+    username: postgres
+    password: postgres
+    database: null
+  
+  dataPersistence:
+    enabled: false
+    storageClassName: default
+    mountPath: /postgres/data
+    size: 5Gi
+ 
+  extraEnv: []
+  #- name: example
+  #  value: SomeValue
+  
+  image:
+    registry: docker.io
+    repository: postgres
+    tag: ""
+    pullPolicy: IfNotPresent
+    pullSecrets: []
+  
+  serviceAccount:
+    create: true
+    name: ""
+    annotations: {}
+  
+  podAnnotations: {}
+  
+  service:
+    type: ClusterIP
+    port: 5432
+  
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits: {}
+  
+  startupProbe:
+    enabled: false
+  livenessProbe:
+    enabled: false
+  readinessProbe:
+    enabled: true
+
+consul:
+  meshEnabled: false
+  intentions: []
+  #- name: pgadmin4
+  #  action: allow

@@ -1,0 +1,13 @@
+{{- if .Values.consul.meshEnabled }}
+apiVersion: consul.hashicorp.com/v1alpha1
+kind: ServiceDefaults
+
+metadata:
+  name: {{ printf "%s-defaults" (include "activemq.fullname" .) }}
+  namespace: {{ .Release.Namespace | quote }}
+  labels: {{- include "activemq.labels" . | nindent 4 }}
+
+spec:
+  protocol: tcp
+
+{{- end }}

@@ -1,0 +1,24 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: pgadmin4
+
+configMapGenerator:
+- name: pgadmin4-config
+  files:
+  - servers.json=./files/servers.json
+
+resources:
+- namespace.yaml
+- pgadmin4-serviceaccount.yaml
+- pgadmin4-service.yaml
+- pgadmin4-deployment.yaml
+
+commonLabels:
+  app: pgadmin4
+  stack: tools
+
+commonAnnotations: {}
+
+images:
+- name: dpage/pgadmin4
+  newTag: latest

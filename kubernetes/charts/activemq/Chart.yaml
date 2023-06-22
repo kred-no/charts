@@ -1,0 +1,7 @@
+apiVersion: v2
+name: activemq
+description: A Helm chart for Kubernetes
+icon: https://www.kred.no/wp-content/uploads/2023/05/cropped-Kreditorforeningen-32x32.png
+type: application
+version: '0.1.0'
+appVersion: '5.18.1'

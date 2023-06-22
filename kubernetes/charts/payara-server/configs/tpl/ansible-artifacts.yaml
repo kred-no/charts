@@ -1,0 +1,12 @@
+{{- if .Values.initContainer.mavenArtifacts }}
+artifacts:
+{{- range .Values.initContainer.mavenArtifacts }}
+- name: {{ .name }}
+  repository: {{ .repository }}
+  group: {{ .group }}
+  extension: {{ .extension | default "war" }}
+  version: {{ .version | default "latest" }}
+{{- end }}
+{{- else }}
+artifacts: []
+{{- end }}

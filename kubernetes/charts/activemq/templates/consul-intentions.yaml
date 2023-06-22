@@ -1,0 +1,19 @@
+{{- if .Values.consul.intentions }}
+---
+apiVersion: consul.hashicorp.com/v1alpha1
+kind: ServiceIntentions
+
+metadata:
+  name: {{ printf "%s-intentions" (include "activemq.fullname" .) }}
+  namespace: {{ .Release.Namespace | quote }}
+  labels: {{- include "activemq.labels" . | nindent 4 }}
+
+spec:
+  destination:
+    name: {{ include "activemq.fullname" . }}
+  sources:
+  {{- range $svc := .Values.consul.intentions }}
+  - name: {{ $svc.name }}
+    action: {{ default "allow" $svc.action }}
+  {{- end }}
+{{- end }}

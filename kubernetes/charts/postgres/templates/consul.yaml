@@ -1,0 +1,31 @@
+{{- if .Values.consul.meshEnabled }}
+apiVersion: consul.hashicorp.com/v1alpha1
+kind: ServiceDefaults
+
+metadata:
+  name: {{ include "postgres.fullname" . }}
+  namespace: {{ .Release.Namespace | quote }}
+
+spec:
+  protocol: tcp
+{{- end }}
+
+{{- if and ( eq .Values.consul.meshEnabled true ) ( gt (len .Values.consul.intentions) 0 ) }}
+---
+apiVersion: consul.hashicorp.com/v1alpha1
+kind: ServiceIntentions
+
+metadata:
+  name: {{ printf "%s-intentions" (include "postgres.fullname" .) }}
+  namespace: {{ .Release.Namespace | quote }}
+  labels: {{- include "postgres.labels" . | nindent 4 }}
+
+spec:
+  destination:
+    name: {{ include "postgres.fullname" . }}
+  sources:
+  {{- range $source := .Values.consul.intentions }}
+  - name: {{ $source.name }}
+    action: {{ default "allow" $source.action }}
+  {{- end }}
+{{- end }}

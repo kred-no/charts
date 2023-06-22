@@ -1,0 +1,25 @@
+{{- if .Values.gatewayApi.enabled }}
+apiVersion: consul.hashicorp.com/v1alpha1
+kind: ServiceDefaults
+
+metadata:
+  name: {{ include "payara-server.fullname" . }}
+  namespace: {{ .Release.Namespace | quote }}
+
+spec:
+  protocol: http
+---
+apiVersion: consul.hashicorp.com/v1alpha1
+kind: ServiceIntentions
+
+metadata:
+  name: allow-gateway-api-to-{{ include "payara-server.fullname" . }}
+  namespace: {{ .Release.Namespace | quote }}
+
+spec:
+  destination:
+    name: {{ include "payara-server.fullname" . }}
+  sources:
+  - name: {{ .Values.gatewayApi.name }}
+    action: allow
+{{- end }}

@@ -1,0 +1,30 @@
+{{- if .Values.server.consoleService.create }}
+apiVersion: v1
+kind: Service
+
+metadata:
+  name: {{ include "payara-server.fullname" . }}-console
+  namespace: {{ .Release.Namespace | quote }}
+  labels:
+    {{- include "payara-server.labels" . | nindent 4 }}
+  {{- with .Values.server.consoleService.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+
+spec:
+  type: {{ .Values.server.consoleService.type }}
+  ports:
+  - port: {{ .Values.server.consoleService.port }}
+    targetPort: console
+    protocol: TCP
+    name: console
+  {{- if .Values.server.consoleService.debugPort.enabled }}
+  - port: {{ .Values.server.consoleService.debugPort.port }}
+    targetPort: debug
+    protocol: TCP
+    name: debug
+  {{- end }}
+  selector:
+    {{- include "payara-server.selectorLabels" . | nindent 4 }}
+{{- end }}

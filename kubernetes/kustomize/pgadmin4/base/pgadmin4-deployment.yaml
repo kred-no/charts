@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+
+metadata:
+  name: pgadmin4
+
+spec:
+  replicas: 1
+  revisionHistoryLimit: 2
+  template:
+    metadata:
+      annotations: {}
+    spec:
+      serviceAccountName: pgadmin4 # Required by Consul Connect
+      containers:
+      - name: pgadmin4
+        image: dpage/pgadmin4:latest
+        env:
+        - name: PGADMIN_SERVER_JSON_FILE
+          value: /pgadmin4/config/servers.json
+        - name: PGADMIN_DEFAULT_EMAIL
+          value: admin@kred.no
+        - name: PGADMIN_DEFAULT_PASSWORD
+          value: secret
+        - name: PGADMIN_DISABLE_POSTFIX
+          value: 'true'
+        - name: SCRIPT_NAME
+          value: /pgadmin4
+        ports:
+        - name: http
+          containerPort: 80
+          protocol: TCP
+        resources:
+          requests:
+            cpu: 50m
+            memory: 64Mi
+          limits:
+            cpu: 250m
+            memory: 384Mi
+        volumeMounts:
+        - name: pgadmin4-config
+          mountPath: /pgadmin4/config/servers.json
+          subPath: servers.json # the "path"
+      terminationGracePeriodSeconds: 10
+      volumes:
+      - name: pgadmin4-config
+        configMap:
+          name: pgadmin4-config
+          items:
+          - key: servers.json
+            path: servers.json

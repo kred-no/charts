@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: ConfigMap
+
+metadata:
+  name: {{ printf "%s-config" (include "jetty.fullname" .) }}
+  namespace: {{ .Release.Namespace | quote }}
+  labels: {{- include "jetty.labels" . | nindent 4 }}
+
+data:
+{{- with .Files.Glob "configs/*" }}
+{{ .AsConfig | nindent 2 }}
+{{- end }}
+
+{{- with .Files.Glob "configs/tpl/*" }}
+{{ tpl .AsConfig $ | nindent 2 }}
+{{- end }}

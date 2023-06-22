@@ -1,0 +1,18 @@
+server:
+  replicaCount: 1
+  
+  credentials:
+    username: postgres
+    password: SecretLogin
+    database: example
+  
+  dataDir: /postgres/data/pgdata
+
+  dataPersistence:
+    enabled: true
+
+consul:
+  meshEnabled: true
+  intentions:
+  - name: pgadmin4
+    action: allow

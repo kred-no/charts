@@ -1,0 +1,92 @@
+nameOverride: ""
+fullnameOverride: ""
+
+server:
+  replicaCount: 1
+  env:
+  - name: TZ
+    value: Europe/Oslo
+  - name: LC_ALL
+    value: no_NO.ISO-8859-1
+  - name: MEM_MAX_RAM_PERCENTAGE
+    value: '85'
+  image:
+    repository: kdsda/payara-server-full
+    pullPolicy: IfNotPresent
+    tag: ""
+  imagePullSecrets: []
+  
+  podAnnotations: {}
+
+  serviceAccount:
+    create: true
+    name: ""
+
+  httpService:
+    create: true
+    type: ClusterIP
+    port: 8080
+    annotations: {}
+
+  consoleService:
+    create: false
+    type: ClusterIP
+    port: 4848
+    annotations: {}
+    debugPort:
+      enabled: false
+      port: 9009
+
+  resources: {}
+  # requests:
+  #   cpu: 100m
+  #   memory: 384Mi
+  # limits:
+  #   cpu: 1000m
+  #   memory: 8192Mi
+
+# Commands to run before starting Payara server
+preBootCommands: |-
+  # Logging properties
+  set server.thread-pools.thread-pool.http-thread-pool.max-thread-pool-size=512
+  set server.thread-pools.thread-pool.thread-pool-1.max-thread-pool-size=512
+  set server.network-config.protocols.protocol.http-listener-1.http.max-connections=1000
+  set server.network-config.protocols.protocol.http-listener-1.http.timeout-seconds=60
+  set server.network-config.protocols.protocol.http-listener-1.http.scheme-mapping=X-Forwarded-Proto
+  set server.network-config.transports.transport.tcp.acceptor-threads=2
+
+# Commands to run after starting Payara server (e.g. deployments)
+postBootCommands: ""
+
+# Create an ansible-container for downloading artifacts
+# before the payara server starts.
+initContainer:
+  create: true
+
+  image:
+    repository: kdsda/ansible
+    pullPolicy: IfNotPresent
+    tag: "2023.23"
+  imagePullSecrets: []
+
+  mavenCredentials:
+    url: ""
+    username: ""
+    password: ""
+
+  # Files to download from Maven before starting Payara server
+  mavenArtifacts: []
+  #- name: "xx"
+  #  repository: "yy"
+  #  group: "example.com"
+  #  extension: "war"
+  #  version: "0.1.0"
+
+gatewayApi:
+  enabled: false
+  name: consul-api-gateway
+  namespace: consul
+
+# Consul configuration
+consul:
+  meshEnabled: false

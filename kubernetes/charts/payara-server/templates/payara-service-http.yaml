@@ -1,0 +1,24 @@
+{{- if .Values.server.httpService.create }}
+apiVersion: v1
+kind: Service
+
+metadata:
+  name: {{ include "payara-server.fullname" . }}
+  namespace: {{ .Release.Namespace | quote }}
+  labels:
+    {{- include "payara-server.labels" . | nindent 4 }}
+  {{- with .Values.server.httpService.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+
+spec:
+  type: {{ .Values.server.httpService.type }}
+  ports:
+  - port: {{ .Values.server.httpService.port }}
+    targetPort: http
+    protocol: TCP
+    name: http
+  selector:
+    {{- include "payara-server.selectorLabels" . | nindent 4 }}
+{{- end }}

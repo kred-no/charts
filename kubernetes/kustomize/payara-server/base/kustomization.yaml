@@ -1,0 +1,24 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: payara
+
+configMapGenerator: []
+#- name: payara-config
+#  files:
+#  - preboot.asadmin=./files/preboot.asadmin
+#  - postboot.asadmin=./files/postboot.asadmin
+
+resources:
+- namespace.yaml
+- serviceaccount.yaml
+- service.yaml
+- deployment.yaml
+
+commonLabels:
+  app: payara-server
+
+commonAnnotations: {}
+
+images:
+- name: kdsda/payara-server-full
+  newTag: 5.2022.5-jdk17

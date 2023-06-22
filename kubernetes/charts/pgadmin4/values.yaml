@@ -1,0 +1,55 @@
+# Chart: pgadmin4
+replicaCount: 1
+
+image:
+  repository: dpage/pgadmin4
+  pullPolicy: IfNotPresent
+  tag: ""
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  create: true
+  annotations: {}
+  name: ""
+
+service:
+  type: ClusterIP
+  port: 80
+
+resources:
+  requests:
+    cpu: 50m
+    memory: 64Mi
+# limits:
+#   cpu: 100m
+#   memory: 128Mi
+
+podAnnotations: {}
+podSecurityContext: {}
+securityContext: {}
+
+nodeSelector: {}
+tolerations: []
+affinity: {}
+
+consul:
+  meshEnabled: false
+  intentions: []
+  #- name: <source>
+  #  action: allow|deny
+
+extraEnv:  []
+#- name: SomeName
+#  value: SomeValue
+
+credentials:
+  email: admin@example.com
+  password: LogMeIn
+
+serversFilePath: /pgadmin4/config/servers.json
+
+serversFileContent: |-
+  {}

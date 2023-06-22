@@ -1,0 +1,57 @@
+nameOverride: ""
+fullnameOverride: ""
+
+replicaCount: 1
+
+env:
+- name: JVM_OPTIONS
+  value: |-
+    -XX:+UnlockDiagnosticVMOptions
+    -XX:+PrintContainerInfo
+    -XX:MaxRAMPercentage=85
+    -XX:ActiveProcessorCount=1
+
+image:
+  repository: azul/zulu-openjdk-debian
+  pullPolicy: IfNotPresent
+  tag: ""
+
+serviceAccount:
+  create: true
+  name: ""
+  automountServiceAccountToken: true
+  annotations: {}
+
+service:
+  type: ClusterIP
+  port: 80
+
+podAnnotations: {}
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 128Mi
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+
+consul:
+  meshEnabled: false
+  intentions: []
+  serviceDefaults:
+    protocol: http
+
+mavenDownload:
+  enabled: false
+  image:
+    repository: kdsda/ansible
+    tag: '2023.23'
+    pullPolicy: IfNotPresent
+  credentials:
+    url: "example.com"
+    username: "anonymous"
+    password: ""
+
+gatewayApi:
+  enabled: false

@@ -1,0 +1,24 @@
+# Ansible Playbook for downloading from Maven repository
+---
+- hosts: 127.0.0.1
+  gather_facts: false
+
+  tasks:
+  -
+    name: Maven Artifact Download
+    community.general.maven_artifact:
+      dest: "/maven/{{ item.name }}.{{ item.extension }}"
+      repository_url: "{{ lookup('ansible.builtin.env', 'repository_url') }}/{{ item.repository }}"
+      username: "{{ lookup('ansible.builtin.env', 'repository_username') }}"
+      password: "{{ lookup('ansible.builtin.env', 'repository_password') }}"
+      group_id: "{{ item.group }}"
+      artifact_id: "{{ item.name }}"
+      extension: "{{ item.extension }}"
+      version: "{{ item.version }}"
+      mode: 0644
+      keep_name: false
+      verify_checksum: always
+    loop: "{{ artifacts }}"
+  -
+    ansible.builtin.debug:
+      msg: "Ansible tasks completed!"
