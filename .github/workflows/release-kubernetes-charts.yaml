@@ -32,8 +32,7 @@ jobs:
       uses: helm/chart-releaser-action@v1.5.0
       with:
         charts_dir: kubernetes/charts
-        #config: /kubernetes/charts/cr.yaml
         #skip_existing: true # Not yet released for action
       env:
         CR_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
-        CR_SKIP_EXISTING: "false"
+        CR_SKIP_EXISTING: "true"
