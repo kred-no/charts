@@ -11,9 +11,10 @@ This repo contains:
 | Name | Helm | Kustomize | Nomad-Pack |
 | :--  | :--  | :--       | :--        |
 | activemq      | [v0.1.0](./kubernetes/charts/activemq/README.md)      | N/A | N/A | 
-| jetty         | N/A | N/A | N/A | 
+| jetty         | [v0.1.0](./kubernetes/charts/jetty/README.md)         | N/A | N/A | 
 | payara-server | [v0.1.0](./kubernetes/charts/payara-server/README.md) | N/A | N/A | 
-| postgres      | N/A | N/A | N/A | 
+| pgadmin4      | [v0.1.0](./kubernetes/charts/pgadmin4/README.md)      | N/A | N/A | 
+| postgres      | [v0.1.0](./kubernetes/charts/postgres/README.md)      | N/A | N/A | 
 
 ## Usage
 
