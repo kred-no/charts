@@ -26,15 +26,15 @@ jobs:
     -
       name: Install Helm
       uses: azure/setup-helm@v3
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}"
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}"
     -
       name: Run 'Chart Releaser' action
       uses: helm/chart-releaser-action@v1.5.0
       with:
-        version: v1.5.0
-        charts_dir: ./kubernetes/charts
+        charts_dir: kubernetes/charts
         #config: /kubernetes/charts/cr.yaml
-        #skip_existing: true # Not released
+        #skip_existing: true # Not released for action
       env:
         CR_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+        CR_SKIP_EXISTING: "true"
