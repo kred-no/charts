@@ -20,7 +20,17 @@ Content:
 
 ## Tips
 
+#### Kubernetes Cheat-Sheet
 ```bash
 # List all pods, except in flux/kube-system
 kubectl get pods -A --field-selector=metadata.namespace!=kube-system,metadata.namespace!=flux-system
+```
+
+#### Git: Fix 'filemode' for windows/wls2
+```bash
+# Current repository
+git config core.filemode false   
+
+# Globally
+git config --global core.filemode false
 ```

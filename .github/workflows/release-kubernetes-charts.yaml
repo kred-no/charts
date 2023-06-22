@@ -1,11 +1,10 @@
-name: Release Charts
+name: Release Kubernetes Charts
 
 on:
   workflow_dispatch:
-
   push:
-    #tags:
-    #- '*-v*.*.*' # <ChartName>-v<ChartVersion>
+    paths:
+    - kubernetes/charts/**
     branches:
     - main
 
@@ -17,7 +16,7 @@ jobs:
       name: Run 'Checkout' action
       uses: actions/checkout@v3
       with:
-        fetch-depth: 0
+        fetch-depth: 0 # This is important!
     -
       name: Configure Git
       run: |
@@ -34,7 +33,7 @@ jobs:
       with:
         charts_dir: kubernetes/charts
         #config: /kubernetes/charts/cr.yaml
-        #skip_existing: true # Not released for action
+        #skip_existing: true # Not yet released for action
       env:
         CR_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
-        CR_SKIP_EXISTING: "true"
+        CR_SKIP_EXISTING: "false"

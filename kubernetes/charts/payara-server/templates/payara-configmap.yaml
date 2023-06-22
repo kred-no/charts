@@ -6,13 +6,14 @@ metadata:
   namespace: {{ .Release.Namespace | quote }}
   labels: {{- include "payara-server.labels" . | nindent 4 }}
 
-data:
+binaryData:
   preboot-commands.asadmin: |-
-    {{- tpl .Values.preBootCommands . | nindent 4 }}
+    {{- tpl .Values.preBootCommands . | b64enc | nindent 4 }}
   
   postboot-commands.asadmin: |-
-    {{- tpl .Values.postBootCommands . | nindent 4 }}
-  
+    {{- tpl .Values.postBootCommands . | b64enc | nindent 4 }}
+
+data:
 {{- with .Files.Glob "configs/*" }}
 {{ .AsConfig | nindent 2 }}
 {{- end }}
