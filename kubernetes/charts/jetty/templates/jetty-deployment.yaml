@@ -1,9 +1,3 @@
-{{- $consulAnnotations := dict
-  "consul.hashicorp.com/connect-inject" (.Values.consul.meshEnabled|quote)
-  "consul.hashicorp.com/connect-service" (include "jetty.fullname" .)
-  "consul.hashicorp.com/connect-service-port" (.Values.service.port|quote)
-}}
-
 apiVersion: apps/v1
 kind: ReplicaSet
 
@@ -23,7 +17,7 @@ spec:
       labels:
         {{- include "jetty.selectorLabels" . | nindent 8 }}
       
-      {{- with merge .Values.podAnnotations $consulAnnotations }}
+      {{- with .Values.podAnnotations }}
       annotations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
@@ -41,19 +35,25 @@ spec:
           value: /maven
         - name: SCRIPT_DIR
           value: /scripts
-        command: ["/bin/bash", "-c", "/scripts/init.sh"]
+        command: ["/scripts/ansible-entrypoint.sh"]
+        #command:
+        #- /bin/env
         volumeMounts:
-        - name: maven
+        -
+          name: maven
           mountPath: /maven
-        - name: jetty-config
-          mountPath: /scripts/init.sh
-          subPath: init.sh
-        - name: jetty-config
-          mountPath: /scripts/playbook.yaml
-          subPath: playbook.yaml
-        - name: jetty-config
-          mountPath: /scripts/artifacts.yaml
-          subPath: artifacts.yaml
+        -
+          name: jetty-config
+          mountPath: /scripts/ansible-entrypoint.sh
+          subPath: ansible-entrypoint.sh
+        -
+          name: jetty-config
+          mountPath: /scripts/ansible-playbook.yaml
+          subPath: ansible-playbook.yaml
+        -
+          name: jetty-config
+          mountPath: /scripts/ansible-artifacts.yaml
+          subPath: ansible-artifacts.yaml
       {{- end }}
       containers:
       - name: jetty
@@ -69,31 +69,40 @@ spec:
           protocol: TCP
         volumeMounts:
         {{- if .Values.mavenDownload.enabled }}
-        - name: maven
+        -
+          name: maven
           mountPath: /maven
         {{- end }}
-        - name: jetty-config
+        -
+          name: jetty-config
           mountPath: /jetty/config.yaml
           subPath: config.yaml
-        command: {{ range $_,$command := .Values.command }}
+        {{- with .Values.command }}
+        command: {{ range $_,$command := . }}
         - {{ $command }}
-        {{- end }}
-        args: {{ range $_,$arg := .Values.args }}
+        {{- end }}{{ end }}
+        {{- with .Values.args }}
+        args: {{ range $_,$arg := . }}
         - {{ $arg }}
-        {{- end }}
+        {{- end }}{{ end }}
       volumes:
       - name: jetty-config
         configMap:
           name: {{ printf "%s-config" (include "jetty.fullname" .) }}
+          defaultMode: 0555
           items:
-          - key: config.yaml
+          -
+            key: config.yaml
             path: config.yaml
           {{- if .Values.mavenDownload.enabled }}
-          - key: ansible-artifacts.yaml
+          -
+            key: ansible-artifacts.yaml
             path: ansible-artifacts.yaml
-          - key: ansible-playbook.yaml
+          -
+            key: ansible-playbook.yaml
             path: ansible-playbook.yaml
-          - key: ansible-entrypoint.sh
+          -
+            key: ansible-entrypoint.sh
             path: ansible-entrypoint.sh
           {{- end }}
       {{- if .Values.mavenDownload.enabled }}
@@ -104,8 +113,10 @@ spec:
           items:
           - key: maven.env
             path: maven.env
+      - name: maven
+        emptyDir: {}
       {{- end }}
-      {{- if .Values.nodeSelector }}
+      {{- with .Values.nodeSelector }}
       nodeSelector:
-        {{- .Values.nodeSelector | toYaml | nindent 8 }}
+        {{- toYaml . | nindent 8 }}
       {{- end }}

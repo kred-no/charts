@@ -14,4 +14,4 @@ if [[ -z $(ansible-galaxy collection list | grep community.general) ]]; then
 ansible-galaxy collection install community.general --upgrade
 fi
 
-ansible-playbook "${SCRIPT_DIR}/playbook.yaml" --extra-vars="@${SCRIPT_DIR}/artifacts.yaml" -vv
+ansible-playbook "${SCRIPT_DIR}/ansible-playbook.yaml" --extra-vars="@${SCRIPT_DIR}/ansible-artifacts.yaml" -vv

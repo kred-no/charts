@@ -15,5 +15,5 @@ data:
   {{- tpl .AsConfig $ | nindent 2 }}
   {{- end }}
 
-  config.yaml:
-    {{- .Values.config  | nindent 4 }}
+  config.yaml: |-
+    {{- .Values.config | nindent 4 }}

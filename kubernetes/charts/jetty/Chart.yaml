@@ -3,5 +3,5 @@ name: jetty
 description: A Helm chart for Kubernetes
 icon: https://www.kred.no/wp-content/uploads/2023/05/cropped-Kreditorforeningen-32x32.png
 type: application
-version: 0.1.1
+version: 0.1.2
 appVersion: "17.0.8"

@@ -1,20 +1,21 @@
 nameOverride: ""
 fullnameOverride: ""
 
-replicaCount: 1
-
 image:
   repository: azul/zulu-openjdk-debian
   pullPolicy: IfNotPresent
   tag: ""
 
-nodeSelector: {}
+nodeSelector: null
+replicaCount: 1
 
 resources:
   requests:
     cpu: 100m
     memory: 128Mi
     limits: {}
+
+podAnnotations: {}
 
 env:
 - name: JVM_OPTIONS
@@ -24,14 +25,18 @@ env:
     -XX:MaxRAMPercentage=85
     -XX:ActiveProcessorCount=1
 
-command: ["java"]
+## Startup Command(s)
+# - java
+command: null
 
-args: ["-version"]
-#- jar
-#- /maven/example.jar
-#- server
-#- /jetty/config.yml
+## Command Arguments(s)
+# - jar
+# - /maven/example.jar
+# - server
+# - /jetty/config.yml
+args: null
 
+## Inline Config-file
 config: |-
   # Filename: /jetty/config.yaml
 
@@ -45,13 +50,11 @@ service:
   type: ClusterIP
   port: 80
 
-podAnnotations: {}
-
 mavenDownload:
   enabled: false
   image:
     repository: kdsda/ansible
-    tag: '2023.23'
+    tag: '2023.33'
     pullPolicy: IfNotPresent
   credentials:
     url: "example.maven.org"
@@ -64,11 +67,3 @@ mavenDownload:
   #   extension: <war>
   #   version: <latest>
 
-gatewayApi:
-  enabled: false
-
-consul:
-  meshEnabled: false
-  intentions: []
-  serviceDefaults:
-    protocol: http
