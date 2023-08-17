@@ -90,3 +90,5 @@ gatewayApi:
 # Consul configuration
 consul:
   meshEnabled: false
+
+nodeSelector: {}

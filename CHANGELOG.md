@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 2023-08-17
+#### <i>CHANGES</i>
+  1. Added 'nodeSelector' for: activemq, jetty & payara-server
+
 ## 2023-06-19
 #### <i>CHANGES</i>
   1. Initialized repository structure

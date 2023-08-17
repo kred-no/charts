@@ -136,3 +136,7 @@ spec:
       - name: maven
         emptyDir: {}
       #terminationGracePeriodSeconds: 10
+      {{- if .Values.nodeSelector }}
+      nodeSelector:
+        {{- .Values.nodeSelector | toYaml | nindent 8 }}
+      {{- end }}

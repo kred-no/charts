@@ -1,4 +1,4 @@
-nameOverride: ""
+Selector=nameOverride: ""
 fullnameOverride: ""
 
 replicaCount: 1
@@ -84,3 +84,13 @@ metrics:
     'prometheus.io/scrape': "true"
     'prometheus.io.scheme': http
     'prometheus.io/path': /metrics
+
+# Example:
+#
+# ```yaml
+# nodeSelector: |
+#   beta.kubernetes.io/arch: amd64
+# ```
+#
+# @type: string
+nodeSelector: {}

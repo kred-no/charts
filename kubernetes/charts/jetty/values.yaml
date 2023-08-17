@@ -3,6 +3,19 @@ fullnameOverride: ""
 
 replicaCount: 1
 
+image:
+  repository: azul/zulu-openjdk-debian
+  pullPolicy: IfNotPresent
+  tag: ""
+
+nodeSelector: {}
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 128Mi
+    limits: {}
+
 env:
 - name: JVM_OPTIONS
   value: |-
@@ -11,10 +24,16 @@ env:
     -XX:MaxRAMPercentage=85
     -XX:ActiveProcessorCount=1
 
-image:
-  repository: azul/zulu-openjdk-debian
-  pullPolicy: IfNotPresent
-  tag: ""
+command: ["java"]
+
+args: ["-version"]
+#- jar
+#- /maven/example.jar
+#- server
+#- /jetty/config.yml
+
+config: |-
+  # Filename: /jetty/config.yaml
 
 serviceAccount:
   create: true
@@ -28,20 +47,6 @@ service:
 
 podAnnotations: {}
 
-resources:
-  requests:
-    cpu: 100m
-    memory: 128Mi
-  # limits:
-  #   cpu: 100m
-  #   memory: 128Mi
-
-consul:
-  meshEnabled: false
-  intentions: []
-  serviceDefaults:
-    protocol: http
-
 mavenDownload:
   enabled: false
   image:
@@ -49,9 +54,21 @@ mavenDownload:
     tag: '2023.23'
     pullPolicy: IfNotPresent
   credentials:
-    url: "example.com"
+    url: "example.maven.org"
     username: "anonymous"
-    password: ""
+    password: "anonymous"
+  artifacts: []
+  # - name: <required>
+  #   repository: <required>
+  #   group: <required>
+  #   extension: <war>
+  #   version: <latest>
 
 gatewayApi:
   enabled: false
+
+consul:
+  meshEnabled: false
+  intentions: []
+  serviceDefaults:
+    protocol: http

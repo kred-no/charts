@@ -1,1 +1,12 @@
+{{- if .Values.mavenDownload.artifacts }}
+artifacts:
+{{- range .Values.mavenDownload.artifacts }}
+- name: {{ .name }}
+  repository: {{ .repository }}
+  group: {{ .group }}
+  extension: {{ .extension | default "war" }}
+  version: {{ .version | default "latest" }}
+{{- end }}
+{{- else }}
 artifacts: []
+{{- end }}
