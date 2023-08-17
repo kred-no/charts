@@ -49,6 +49,17 @@ entries:
   payara-server:
   - apiVersion: v2
     appVersion: 5.2022.5-jdk17
+    created: "2023-08-17T13:57:02.866620628Z"
+    description: A Helm chart for Kubernetes
+    digest: 8fe75ddd874c63ab63244e12d9ea894b5e767a21c5a9cc7220b7beca6bd858c8
+    icon: https://www.kred.no/wp-content/uploads/2023/05/cropped-Kreditorforeningen-32x32.png
+    name: payara-server
+    type: application
+    urls:
+    - https://github.com/kred-no/charts/releases/download/payara-server-0.1.1/payara-server-0.1.1.tgz
+    version: 0.1.1
+  - apiVersion: v2
+    appVersion: 5.2022.5-jdk17
     created: "2023-06-22T10:47:57.765528625Z"
     description: A Helm chart for Kubernetes
     digest: 582274d7072e3fecd4dc5ee1b4b2adbece2fbd6e8364205170b011637e5dbb46
@@ -82,4 +93,4 @@ entries:
     urls:
     - https://github.com/kred-no/charts/releases/download/postgres-0.1.0/postgres-0.1.0.tgz
     version: 0.1.0
-generated: "2023-08-17T13:55:10.247945006Z"
+generated: "2023-08-17T13:57:02.866631628Z"
