@@ -3,6 +3,17 @@ entries:
   activemq:
   - apiVersion: v2
     appVersion: 5.18.1
+    created: "2023-08-17T13:55:09.781232009Z"
+    description: A Helm chart for Kubernetes
+    digest: 4e2c4a2df8b3964caa35c5a19b9414d00b5fe870bb8c7ca4d908af3175bd06a7
+    icon: https://www.kred.no/wp-content/uploads/2023/05/cropped-Kreditorforeningen-32x32.png
+    name: activemq
+    type: application
+    urls:
+    - https://github.com/kred-no/charts/releases/download/activemq-0.1.1/activemq-0.1.1.tgz
+    version: 0.1.1
+  - apiVersion: v2
+    appVersion: 5.18.1
     created: "2023-06-22T10:47:57.321162734Z"
     description: A Helm chart for Kubernetes
     digest: 55b95a7a0f45d90caf9a28b9bf07e639d121a08b1daaaca19d77c400bc800606
@@ -13,6 +24,17 @@ entries:
     - https://github.com/kred-no/charts/releases/download/activemq-0.1.0/activemq-0.1.0.tgz
     version: 0.1.0
   jetty:
+  - apiVersion: v2
+    appVersion: 17.0.8
+    created: "2023-08-17T13:55:10.020181844Z"
+    description: A Helm chart for Kubernetes
+    digest: b7d4b3a36e181198ea7c3b04b97c49cc23aafb2c349652a63bff64614fef9660
+    icon: https://www.kred.no/wp-content/uploads/2023/05/cropped-Kreditorforeningen-32x32.png
+    name: jetty
+    type: application
+    urls:
+    - https://github.com/kred-no/charts/releases/download/jetty-0.1.1/jetty-0.1.1.tgz
+    version: 0.1.1
   - apiVersion: v2
     appVersion: 17.0.7
     created: "2023-06-22T10:47:57.54485019Z"
@@ -60,4 +82,4 @@ entries:
     urls:
     - https://github.com/kred-no/charts/releases/download/postgres-0.1.0/postgres-0.1.0.tgz
     version: 0.1.0
-generated: "2023-06-22T10:47:58.173466163Z"
+generated: "2023-08-17T13:55:10.247945006Z"
