@@ -26,6 +26,17 @@ entries:
   jetty:
   - apiVersion: v2
     appVersion: 17.0.8
+    created: "2023-08-17T19:12:13.418849093Z"
+    description: A Helm chart for Kubernetes
+    digest: f1693835bc91ad0ef1a82d5f3f7c2af343302825539863bb8a0ef35714f73acb
+    icon: https://www.kred.no/wp-content/uploads/2023/05/cropped-Kreditorforeningen-32x32.png
+    name: jetty
+    type: application
+    urls:
+    - https://github.com/kred-no/charts/releases/download/jetty-0.1.2/jetty-0.1.2.tgz
+    version: 0.1.2
+  - apiVersion: v2
+    appVersion: 17.0.8
     created: "2023-08-17T13:55:10.020181844Z"
     description: A Helm chart for Kubernetes
     digest: b7d4b3a36e181198ea7c3b04b97c49cc23aafb2c349652a63bff64614fef9660
@@ -93,4 +104,4 @@ entries:
     urls:
     - https://github.com/kred-no/charts/releases/download/postgres-0.1.0/postgres-0.1.0.tgz
     version: 0.1.0
-generated: "2023-08-17T13:57:02.866631628Z"
+generated: "2023-08-17T19:12:13.418863894Z"
